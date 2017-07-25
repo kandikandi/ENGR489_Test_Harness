@@ -26,7 +26,7 @@ dataset = datasets(30)
 X = dataset.get_X()
 y = dataset.get_y()
 
-#X = SelectKBest(chi2, k=3).fit_transform(X,y)
+X = SelectKBest(chi2, k=3).fit_transform(X,y)
 
 #Split data for training and testing
 k_fold = dataset.get_kFold()

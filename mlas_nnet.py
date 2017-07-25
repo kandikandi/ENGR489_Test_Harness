@@ -21,32 +21,44 @@ from sklearn.feature_selection import chi2
 import random
 from mla_load_data import datasets
 
-dataset = datasets(30)
+datasets_array = []
 
-X = dataset.get_X()
-y = dataset.get_y()
+datasets_array.append(datasets(30))
+datasets_array.append(datasets(20))
+datasets_array.append(datasets(10))
+datasets_array.append(datasets(5))
 
-#X = SelectKBest(chi2, k=5).fit_transform(X,y)
+for data in datasets_array:
+    print "##########################################"
+    X = data.get_X()
+    y = data.get_y()
 
-#Split data for training and testing
-k_fold = dataset.get_kFold()
+    j = data.get_num_features()
 
-nn_classifier = MLPClassifier(solver='lbfgs', alpha=1e-5,  hidden_layer_sizes=(5, 2), random_state=1)
+    while j > 0:
+        print "******************************************"
+        print "num features = ", j
+        X = SelectKBest(chi2, k=j).fit_transform(X,y)
 
+        #Split data for training and testing
+        k_fold = data.get_kFold()
+        
+        
+        for beta in range (2,10):
+            hls = (float(data.get_num_samples())/(beta*(j + data.get_num_classes()))) #number of neurons in hidden layer, beta is a scaling value
+            print "hidden layer neurons =",int(hls)
+            nn_classifier = MLPClassifier(solver='adam', alpha=1e-5,  hidden_layer_sizes=(int(hls),), random_state=1)
 
-for train, test in k_fold.split(X,y):
-    X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
+            for train, test in k_fold.split(X,y):
+                X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
 
-    nn_classifier.fit(X_train,y_train)
+                nn_classifier.fit(X_train,y_train)
     
-    results = nn_classifier.predict(X_test)
-    mislabeled = (y_test != results).sum()
-    print results
-    print mislabeled,len(y_test)
-    print (y_test)
-    print '\n'
+                results = nn_classifier.predict(X_test)
+                correct = (y_test == results).sum()
+                print correct,len(y_test), int(float(correct)/len(y_test)*100),"%"
     
-
+        j = j-3
     
 
 
