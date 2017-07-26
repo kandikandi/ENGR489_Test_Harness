@@ -38,6 +38,7 @@ class datasets:
     num_features = None
     num_samples = None
     num_classes = None
+    classes = None
 
     def __init__(self,folds):
         """Initialise"""
@@ -59,7 +60,12 @@ class datasets:
                         j = j + 1
                     else:
                         self.num_classes = int(s)
-                elif i == 1 or i == 3:
+                        self.classes = np.empty([self.num_classes], dtype = "S16")
+                elif i == 1:
+                    if j < self.num_classes:
+                        self.classes[j] = s.rstrip()
+                        j = j + 1                
+                elif i == 3:
                     continue
                 elif i % 2 == 1:
                     if j < self.num_features:
@@ -92,6 +98,41 @@ class datasets:
         return self.num_classes
 
 
+class results:
+    
+    folds = None
+    params = None
+    results = None
+    labels = None
+    dataset = None
+    train_t = None
+    test_t = None
+    total_t = None
+        
+    
+    def __init__(self,folds,params,results,labels,dataset,test_t,train_t):
+        self.folds = folds
+        self.params = params
+        self.results = results
+        self.labels = labels
+        self.dataset = dataset
+        self.train_t = train_t
+        self.test_t = test_t
+        self.total_t = train_t + test_t
+
+        print_all_class()
+        for i in range(0,dataset.get_num_classes()):
+            print i
+
+        
+    
+    def print_all_class(self):
+        print "this is hard"
+
+
+    
+    def print_one_class(self,class_idx) :
+        print "just one class"
 
 
 

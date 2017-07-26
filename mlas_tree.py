@@ -21,30 +21,41 @@ from sklearn.feature_selection import chi2
 import random
 from mla_load_data import datasets
 
-dataset = datasets(30)
+datasets_array = []
 
-X = dataset.get_X()
-y = dataset.get_y()
+datasets_array.append(datasets(30))
+datasets_array.append(datasets(20))
+datasets_array.append(datasets(10))
+datasets_array.append(datasets(5))
 
-X = SelectKBest(chi2, k=3).fit_transform(X,y)
+for data in datasets_array:
+    print "##########################################"
+    X = data.get_X()
+    y = data.get_y()
 
-#Split data for training and testing
-k_fold = dataset.get_kFold()
+    j = data.get_num_features()
 
-tree_classifier = tree.DecisionTreeClassifier()
+    while j > 0:
+        print "******************************************"
+        print "num features = ", j
+        X = SelectKBest(chi2, k=j).fit_transform(X,y)
+
+        #Split data for training and testing
+        k_fold = data.get_kFold()
+
+        tree_classifier = tree.DecisionTreeClassifier(class_weight = 'balanced')
 
 
-for train, test in k_fold.split(X,y):
-    X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
+        for train, test in k_fold.split(X,y):
+            X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
 
-    tree_classifier.fit(X_train,y_train)
+            tree_classifier.fit(X_train,y_train)
     
-    results = tree_classifier.predict(X_test)
-    mislabeled = (y_test != results).sum()
-    print results
-    print mislabeled,len(y_test)
-    print (y_test)
-    print '\n'
+            results = tree_classifier.predict(X_test)
+            correct = (y_test == results).sum()
+            print correct,len(y_test), int(float(correct)/len(y_test)*100),"%"
+        
+        j = j-3
     
 
     

@@ -65,7 +65,7 @@ for data in datasets_array:
         while k < 20:
             print"/////////////////////////////////////////"
             print "k = ",k
-            knn_classifier = neighbors.KNeighborsClassifier(k, weights='distance', algorithm='auto', p=1)
+            knn_classifier = neighbors.KNeighborsClassifier(k,  algorithm='auto', p=1)
 
 
             for train, test in k_fold.split(X,y):

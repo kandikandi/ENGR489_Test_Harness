@@ -47,7 +47,7 @@ for data in datasets_array:
             print "///////////////////////////////////////"
             print "k = ",k," k1 = ",k-10
             k1 = k-10
-            svm_classifier = svm.SVC(kernel = 'rbf', gamma= 2**k1 , C= 2**k, cache_size=500,  decision_function_shape='ovr')
+            svm_classifier = svm.SVC(kernel = 'rbf', gamma= 2**k1 , C= 2**k, cache_size=500,  decision_function_shape='ovr', class_weight = 'balanced')
 
             for train, test in k_fold.split(X,y):
                 X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
@@ -55,7 +55,7 @@ for data in datasets_array:
     
                 results = svm_classifier.predict(X_train)
                 correct = (y_train == results).sum()
-                print correct,len(y_train), int(float(correct)/len(y_train)*100)
+                print int(float(correct)/len(y_train)*100),"%"
  
     
         j = j-3
