@@ -40,9 +40,9 @@ class datasets:
     num_classes = None
     classes = None
 
-    def __init__(self,folds):
+    def __init__(self,folds,filename):
         """Initialise"""
-        f = open('flow_output.txt','r')
+        f = open(filename,'r')
 
         i = 0
 
@@ -96,45 +96,6 @@ class datasets:
 
     def get_num_classes(self):
         return self.num_classes
-
-
-class results:
-    
-    folds = None
-    params = None
-    results = None
-    labels = None
-    dataset = None
-    train_t = None
-    test_t = None
-    total_t = None
-        
-    
-    def __init__(self,folds,params,results,labels,dataset,test_t,train_t):
-        self.folds = folds
-        self.params = params
-        self.results = results
-        self.labels = labels
-        self.dataset = dataset
-        self.train_t = train_t
-        self.test_t = test_t
-        self.total_t = train_t + test_t
-
-        print_all_class()
-        for i in range(0,dataset.get_num_classes()):
-            print i
-
-        
-    
-    def print_all_class(self):
-        print "this is hard"
-
-
-    
-    def print_one_class(self,class_idx) :
-        print "just one class"
-
-
 
 
 
