@@ -25,7 +25,7 @@ import time
 import sys
 
 if len(sys.argv) != 2:
-    print "Please provide a data file"
+    print ("Please provide a data file")
     sys.exit() 
 
 data = datasets(10,sys.argv[1])
@@ -104,7 +104,7 @@ while x <= 5: #run tests 5 times
 
             f.write('{0},{1},{2},{3},{4},{5:.3f},{6:.3f},{7:.3f}\n'.format(x,j,k,hls,'true',np.average(all_acc),np.average(all_train),np.average(all_test)))
 
-        k = k + 5     
+            k = k + 5     
         j = j-3
 
     x = x + 1
