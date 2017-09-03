@@ -15,6 +15,7 @@
 import numpy as np
 import random
 from sklearn.model_selection import StratifiedKFold
+import pandas as pd
 
 #Flows within flows.txt are in the following format:
 #First line: first 3 values are total number of flows(x) and number of features recorded(n) and number of applications(m)
@@ -26,7 +27,7 @@ from sklearn.model_selection import StratifiedKFold
 #skype facebook
 #1.0 3.4 5.0 2.3 12.0 facebook
 
-#For SVM, X is array of size [num_samples, num_features]. Y is array of their labels size [num_samples]
+#X is array of size [num_samples, num_features]. y is array of their labels size [num_samples]
 
 #Read the data into arrays
 
@@ -34,51 +35,31 @@ class datasets:
 
     X = None
     y = None
+    class_names = None
     k_fold =None
     num_features = None
     num_samples = None
     num_classes = None
-    classes = None
+    feature_names = None
 
     def __init__(self,folds,filename):
         """Initialise"""
-        f = open(filename,'r')
 
-        i = 0
+        num_data = pd.read_csv(filename, nrows=1, header=None)
+        self.num_features = num_data.iloc[0,1]
+        self.num_samples = num_data.iloc[0,0]
+        self.num_classes = num_data.iloc[0,2]
 
-        for line in f:
-            j = 0
-            for s in line.split(' '):
-                if i == 0:
-                    if j == 0:
-                        self.num_samples = int(s)
-                        j = j + 1
-                    elif j == 1:
-                        self.num_features = int(s)
-                        self.X = np.zeros((self.num_samples, self.num_features))
-                        self.y = np.empty([self.num_samples], dtype = "S16")
-                        j = j + 1
-                    else:
-                        self.num_classes = int(s)
-                        self.classes = np.empty([self.num_classes], dtype = "S16")
-                elif i == 1:
-                    if j < self.num_classes:
-                        self.classes[j] = s.rstrip()
-                        j = j + 1                
-                elif i == 3:
-                    continue
-                elif i % 2 == 1:
-                    if j < self.num_features:
-                        self.X[(i-4)/2][j] = float(s)    
-                        j = j + 1
-                    else:
-                        self.y[(i-4)/2] = s.rstrip()              
-                else:
-                    continue
-            i = i + 1
+        self.feature_names = pd.read_csv(filename, nrows = 1, skiprows=1, header=None)                
 
+        data_df = pd.read_csv(filename, skiprows=2)
+
+        self.X = data_df.iloc[:, 5:-2].values
+        self.y = data_df.iloc[:,-1].values
+        self.class_names = data_df.iloc[:,-2].values
+       
         self.k_fold = StratifiedKFold(n_splits=folds)
-        
+       
     def get_X(self):
         return self.X
 
@@ -96,6 +77,12 @@ class datasets:
 
     def get_num_classes(self):
         return self.num_classes
+
+    def get_class_names(self):
+        return self.class_names
+
+    def get_feature_names(self):
+        return self.class_names
 
 
 

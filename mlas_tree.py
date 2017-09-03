@@ -30,15 +30,16 @@ if len(sys.argv) != 2:
 
 datasets_array = []
 
-datasets_array.append(datasets(30,sys.argv[1]))
-datasets_array.append(datasets(20,sys.argv[1]))
-datasets_array.append(datasets(10,sys.argv[1]))
-datasets_array.append(datasets(5,sys.argv[1]))
+data = datasets(10,sys.argv[1])
 
 f = open('decision_tree.csv', 'w+')
-f.write('decision_tree\nfolds,num_features,accuracy,precision_micro,precision_macro,f1_micro,f1_macro,train_t,test_t,total_t\n')
+f.write('test_num,num_features,scaled,accuracy,train_t,test_t\n')
 
-for data in datasets_array:
+x = 1
+
+while x <= 5: #run tests 5 times
+
+
     X = data.get_X()
     y = data.get_y()
 
@@ -52,25 +53,57 @@ for data in datasets_array:
 
         tree_classifier = tree.DecisionTreeClassifier(class_weight = 'balanced')
 
+        all_acc = np.zeros(10)
+        all_train = np.zeros(10)
+        all_test = np.zeros(10)
+        z = 0
 
         for train, test in k_fold.split(X,y):
             X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
             before_time = time.time()
             tree_classifier.fit(X_train,y_train)
             after_time = time.time()
-            train_t = (after_time - before_time)*1000 #convert to milliseconds   
+            all_train[z] = (after_time - before_time)*1000 #convert to milliseconds   
             before_time = time.time()
             results = tree_classifier.predict(X_test)
             after_time = time.time()
-            test_t = (after_time - before_time)*1000 #convert to milliseconds  
-            f.write('{0},{1},{2:.3f},{3:.3f},{4:.3f},{5:.3f},{6:.3f},{7:.3f},{8:.3f},{9:.3f}\n'.format(k_fold.get_n_splits(),j,accuracy_score(y_test, results),precision_score(y_test, results,  average='micro'),precision_score(y_test, results,  average='macro'),f1_score(y_test,results, average='micro'),f1_score(y_test,results, average='macro'),train_t,test_t,train_t+test_t))
+            all_test[z] = (after_time - before_time)*1000 #convert to milliseconds  
+            all_acc[z] = accuracy_score(y_test, results)           
+            z = z + 1
+
+        f.write('{0},{1},{2},{3:.3f},{4:.3f},{5:.3f}\n'.format(x,j,'false',np.average(all_acc),np.average(all_train),np.average(all_test)))
+
+        all_acc = np.zeros(10)
+        all_train = np.zeros(10)
+        all_test = np.zeros(10)
+        z = 0        
+
+        for train, test in k_fold.split(X,y):
+            X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
+
+            scaler = preprocessing.StandardScaler().fit(X_train)
+            scaler.transform(X_train)
+            scaler.transform(X_test)
+
+            before_time = time.time()
+            tree_classifier.fit(X_train,y_train)
+            after_time = time.time()
+            all_train[z] = (after_time - before_time)*1000 #convert to milliseconds   
+            before_time = time.time()
+            results = tree_classifier.predict(X_test)
+            after_time = time.time()
+            all_test[z] = (after_time - before_time)*1000 #convert to milliseconds  
+            all_acc[z] = accuracy_score(y_test, results)           
+            z = z + 1
+
+        f.write('{0},{1},{2},{3:.3f},{4:.3f},{5:.3f}\n'.format(x,j,'true',np.average(all_acc),np.average(all_train),np.average(all_test)))
         
-        j = j-3
-    
+        j = j-3 #decrease number of features
+
+    x = x + 1 #increment test number
+
 f.close()
     
-
-
 
 
 
